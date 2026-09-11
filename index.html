@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer Program Dashboard - 2026-27</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2D7A3E;
+            --accent: #FF8C42;
+            --bg: #F8F9FA;
+            --text: #212529;
+            --text-light: #6C757D;
+            --border: #DEE2E6;
+            --success: #28A745;
+            --warning: #FFC107;
+            --danger: #DC3545;
+            --info: #17A2B8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a4d2e 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .badge-success { background: var(--success); color: white; }
+        .badge-warning { background: var(--warning); color: black; }
+        .badge-danger { background: var(--danger); color: white; }
+        .badge-info { background: var(--info); color: white; }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .game-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(45, 122, 62, 0.15);
+        }
+
+        .game-date {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-opponent {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .game-details {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin: 0.5rem 0;
+        }
+
+        .school-section {
+            margin-bottom: 3rem;
+        }
+
+        .school-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a4d2e 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-count {
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .roster-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid var(--border);
+            border-top: none;
+        }
+
+        .roster-table th {
+            background: #f5f5f5;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .roster-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .roster-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .grade {
+            background: #f0f0f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .status-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-needs {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .stat-card {
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-logos {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .header-logos img {
+            height: 50px;
+            object-fit: contain;
+            filter: brightness(1.1);
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            object-position: center bottom;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .school-header img {
+            height: 45px;
+            margin-right: 0.75rem;
+            object-fit: contain;
+        }
+
+        .schedule-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .panther-mascot {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+
+        .accordion {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #1a4d2e 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(135deg, #1a4d2e 0%, var(--primary) 100%);
+        }
+
+        .accordion-toggle {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .accordion-toggle.active {
+            transform: rotate(180deg);
+        }
+
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-body.active {
+            max-height: 2000px;
+            transition: max-height 0.3s ease-in;
+        }
+
+        .accordion-content {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .soccer-ball {
+            display: inline-block;
+            animation: bounce 2s infinite;
+            font-size: 2rem;
+            margin: 0 0.5rem;
+        }
+
+        .soccer-ball:nth-child(2) { animation-delay: 0.2s; }
+        .soccer-ball:nth-child(3) { animation-delay: 0.4s; }
+        .soccer-ball:nth-child(4) { animation-delay: 0.6s; }
+
+        /* Custom cursor */
+        * {
+            cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="white" stroke="%232D7A3E" stroke-width="2"/><circle cx="16" cy="16" r="12" fill="none" stroke="%23FF8C42" stroke-width="1.5" opacity="0.7"/><line x1="16" y1="4" x2="16" y2="28" stroke="%232D7A3E" stroke-width="0.5" opacity="0.5"/><line x1="4" y1="16" x2="28" y2="16" stroke="%232D7A3E" stroke-width="0.5" opacity="0.5"/></svg>') 16 16, auto;
+        }
+
+        /* Rolling soccer ball animation */
+        @keyframes rollBall {
+            0% {
+                left: -50px;
+                transform: rotateZ(0deg);
+            }
+            100% {
+                left: 100vw;
+                transform: rotateZ(360deg);
+            }
+        }
+
+        .rolling-ball {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            font-size: 3rem;
+            pointer-events: none;
+            z-index: 9999;
+            animation: rollBall 4s ease-in-out forwards;
+            text-shadow: 0 2px 8px rgba(45, 122, 62, 0.3);
+        }
+
+        .rolling-ball.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="rolling-ball" id="rollingBall">⚽</div>
+
+<div class="container">
+    <div class="header-logos">
+        <img src="images/fenway-logo.webp" alt="Fenway High Logo">
+        <img src="images/bps-logo.png" alt="Boston Public Schools Logo">
+        <img src="images/panthers.jpeg" alt="Fenway Panthers" style="height: 60px; object-fit: contain;">
+    </div>
+
+    <div class="header">
+        <div>
+            <h1>⚽ Soccer Program</h1>
+            <p>2026-2027 Season | Multi-School Initiative</p>
+            <div style="margin-top: 1rem; font-size: 1.5rem;">
+                <span class="soccer-ball">⚽</span>
+                <span class="soccer-ball">⚽</span>
+                <span class="soccer-ball">⚽</span>
+                <span class="soccer-ball">⚽</span>
+            </div>
+        </div>
+        <div>
+            <p>Total Roster: <strong>24 Players</strong></p>
+            <span class="badge badge-info">Season Starts Sept 16</span>
+        </div>
+    </div>
+
+    <img src="images/carter-field.webp" alt="Carter Field" class="hero-image">
+
+    <div style="background: white; border: 2px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--primary); margin-bottom: 1rem;">🔗 Quick Links</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <a href="https://www.bostonpublicschools.org/athletics" target="_blank" style="padding: 0.75rem; background: linear-gradient(135deg, #2D7A3E 0%, #1a4d2e 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; text-align: center; transition: all 0.3s;">BPS Athletics</a>
+            <a href="https://www.miaa.net/" target="_blank" style="padding: 0.75rem; background: linear-gradient(135deg, #2D7A3E 0%, #1a4d2e 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; text-align: center; transition: all 0.3s;">MIAA (MA High School Sports)</a>
+            <a href="https://www.mass.gov/info-details/massachusetts-public-school-athletics" target="_blank" style="padding: 0.75rem; background: linear-gradient(135deg, #2D7A3E 0%, #1a4d2e 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; text-align: center; transition: all 0.3s;">MA Department of Education</a>
+            <a href="https://www.bostonpublicschools.org/Page/3847" target="_blank" style="padding: 0.75rem; background: linear-gradient(135deg, #2D7A3E 0%, #1a4d2e 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; text-align: center; transition: all 0.3s;">BPS Activity Eligibility</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Players</div>
+            <div class="stat-value">24</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Schools</div>
+            <div class="stat-value">4</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Paperwork Complete</div>
+            <div class="stat-value">16</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">First Game</div>
+            <div class="stat-value">Sept 16</div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('schedule')">📅 Schedule</button>
+        <button class="tab-btn" onclick="switchTab('fenway')">🟢 Fenway</button>
+        <button class="tab-btn" onclick="switchTab('snowden')">🟡 Snowden</button>
+        <button class="tab-btn" onclick="switchTab('quincy')">🔵 Quincy</button>
+        <button class="tab-btn" onclick="switchTab('cash')">🟣 CASH</button>
+        <button class="tab-btn" onclick="switchTab('paperwork')">📋 Paperwork</button>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="schedule" class="tab-content active">
+        <div class="accordion" style="margin-bottom: 2rem;">
+            <div class="accordion-header">
+                <div>
+                    <strong>👥 Coaching Staff & Management</strong>
+                </div>
+                <span class="accordion-toggle">▼</span>
+            </div>
+            <div class="accordion-body active">
+                <div class="accordion-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                        <div style="border-left: 4px solid var(--primary); padding-left: 1rem;">
+                            <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Head Coach</h4>
+                            <p style="font-size: 1.1rem; font-weight: 600;">Marcos Baez</p>
+                            <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.25rem;">Program Leadership</p>
+                        </div>
+                        <div style="border-left: 4px solid var(--accent); padding-left: 1rem;">
+                            <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Assistant Coach</h4>
+                            <p style="font-size: 1.1rem; font-weight: 600;">Beni Martinez</p>
+                            <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.25rem;">Player Development</p>
+                        </div>
+                        <div style="border-left: 4px solid var(--info); padding-left: 1rem;">
+                            <h4 style="color: var(--info); margin-bottom: 0.5rem;">Athletic Director</h4>
+                            <p style="font-size: 1.1rem; font-weight: 600;">TBD</p>
+                            <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.25rem;">Multi-School Program</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 style="margin-bottom: 1.5rem; color: var(--primary);">⚽ 2026-2027 Schedule — 18 Games</h2>
+        <div class="schedule-grid">
+            <div class="game-card">
+                <div class="game-date">Wednesday, September 16</div>
+                <div class="game-opponent">vs Madison Park High School</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Madison Park-O'Bryant</div>
+                <div style="margin-top: 1rem;"><span class="badge badge-warning">FIRST GAME</span></div>
+                <img src="images/carter-soccer-1.jpeg" alt="Carter Field Soccer" class="schedule-image">
+            </div>
+            <div class="game-card">
+                <div class="game-date">Friday, September 18</div>
+                <div class="game-opponent">vs Boston Collegiate</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Carter Field</div>
+                <img src="images/carter-soccer-2.jpeg" alt="Carter Field Action" class="schedule-image">
+            </div>
+            <div class="game-card">
+                <div class="game-date">Tuesday, September 22</div>
+                <div class="game-opponent">vs O'Bryant</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Carter Field</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Thursday, September 24</div>
+                <div class="game-opponent">vs New Mission</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Carter Field</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Monday, September 28</div>
+                <div class="game-opponent">vs Charlestown</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Carter Field</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Wednesday, September 30</div>
+                <div class="game-opponent">vs Roxbury Prep</div>
+                <div class="game-details"><strong>Time:</strong> 6:00 PM<br><strong>Location:</strong> West Roxbury</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Friday, October 2</div>
+                <div class="game-opponent">vs Neighborhood House</div>
+                <div class="game-details"><strong>Time:</strong> 6:30 PM<br><strong>Location:</strong> Moakley</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Tuesday, October 6</div>
+                <div class="game-opponent">vs Madison Park</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Carter Field</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Thursday, October 8</div>
+                <div class="game-opponent">vs O'Bryant</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Madison Park-O'Bryant</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Wednesday, October 14</div>
+                <div class="game-opponent">vs New Mission</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Reservation Road</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Friday, October 16</div>
+                <div class="game-opponent">vs Charlestown</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Charlestown</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Monday, October 19</div>
+                <div class="game-opponent">vs Boston Collegiate</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Pope John Paul II</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Tuesday, October 20</div>
+                <div class="game-opponent">vs English</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Carter Field</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Friday, October 23</div>
+                <div class="game-opponent">vs Roxbury Prep</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> Carter Field</div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Monday, October 26</div>
+                <div class="game-opponent">vs South #1</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> North #4<br><strong>Type:</strong> Play-In</div>
+                <div style="margin-top: 1rem;"><span class="badge badge-warning">PLAYOFFS</span></div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Wednesday, October 28</div>
+                <div class="game-opponent">North #1 vs TBD</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> North #1<br><strong>Type:</strong> City SF</div>
+                <div style="margin-top: 1rem;"><span class="badge badge-danger">SEMI-FINAL</span></div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Wednesday, October 28</div>
+                <div class="game-opponent">North #3 vs North #2</div>
+                <div class="game-details"><strong>Time:</strong> 4:00 PM<br><strong>Location:</strong> North #2<br><strong>Type:</strong> City SF</div>
+                <div style="margin-top: 1rem;"><span class="badge badge-danger">SEMI-FINAL</span></div>
+            </div>
+            <div class="game-card">
+                <div class="game-date">Saturday, October 31</div>
+                <div class="game-opponent">TBD City Final</div>
+                <div class="game-details"><strong>Time:</strong> 10:00 AM<br><strong>Location:</strong> Madison Park</div>
+                <div style="margin-top: 1rem;"><span class="badge badge-success">CHAMPIONSHIP</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FENWAY -->
+    <div id="fenway" class="tab-content">
+        <div class="school-section">
+            <div class="school-header"><img src="images/fenway-logo.webp" alt="Fenway Logo">🟢 Fenway High School <span class="player-count">8 Players</span></div>
+            <table class="roster-table">
+                <thead>
+                    <tr><th>Name</th><th>Grade</th><th>Email</th><th>Phone</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="player-name">Faustirano Louicius</td><td><span class="grade">10</span></td><td>flouicius@bostonk12.org</td><td>857-258-4931</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Kai Simon</td><td><span class="grade">10</span></td><td>ksimon4@bostonk12.org</td><td>617-858-9424</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Ronald Dunn</td><td><span class="grade">10</span></td><td>rdunniii@bostonk12.org</td><td>857-259-1341</td><td><span class="status-badge status-ok">✓ OK</span><br><small>Exp 10/11</small></td></tr>
+                    <tr><td class="player-name">Anid Vladi</td><td><span class="grade">12</span></td><td>avladi2@bostonk12.org</td><td>857-364-1230</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Leonardo Contreras</td><td><span class="grade">10</span></td><td>lcontrerasramirez@bostonk12</td><td>857-234-4474</td><td><span class="status-badge status-needs">⚠ Needs consent</span></td></tr>
+                    <tr><td class="player-name">Andy Salvador</td><td><span class="grade">10</span></td><td>asalvadorlandaverde@bostonk12.org</td><td>857-867-6124</td><td><span class="status-badge status-needs">⚠ Needs physical</span></td></tr>
+                    <tr><td class="player-name">Ismael Marseille</td><td><span class="grade">10</span></td><td>ismaelmarseille2010@gmail.com</td><td>857-212-5395</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Martin Alvarado</td><td><span class="grade">11</span></td><td>malvaradodomi@bostonk12.org</td><td>351-209-5853</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SNOWDEN -->
+    <div id="snowden" class="tab-content">
+        <div class="school-section">
+            <div class="school-header"><img src="images/snowden-logo.png" alt="Snowden Logo">🟡 Snowden International <span class="player-count">6 Players</span></div>
+            <table class="roster-table">
+                <thead>
+                    <tr><th>Name</th><th>Grade</th><th>Email</th><th>Phone</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="player-name">Jayc Correia</td><td><span class="grade">12</span></td><td>Jaycorreia2525@gmail.com</td><td>857-206-9017</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Junior Guardado</td><td><span class="grade">10</span></td><td>guardadojunior94@gmail.com</td><td>857-421-3110</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Aisak Flores</td><td><span class="grade">11</span></td><td>floresaisak20@gmail.com</td><td>617-943-0506</td><td><span class="status-badge status-ok">✓ OK</span><br><small>Exp 10/10</small></td></tr>
+                    <tr><td class="player-name">Johann Brooks</td><td><span class="grade">11</span></td><td>jbrooks15@bostonk12.org</td><td>857-335-6907</td><td><span class="status-badge status-ok">✓ OK</span><br><small>Exp 10/8</small></td></tr>
+                    <tr><td class="player-name">Calum Colvin</td><td><span class="grade">11</span></td><td>Colvincalum@gmail.com</td><td>N/A</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Joshua Andres Roman</td><td><span class="grade">9</span></td><td>Jandresroman@bostonk12.org</td><td>617-870-8523</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- QUINCY -->
+    <div id="quincy" class="tab-content">
+        <div class="school-section">
+            <div class="school-header"><img src="images/jqu-logo.jpeg" alt="Josiah Quincy Upper Logo">🔵 Josiah Quincy Upper <span class="player-count">3 Players</span></div>
+            <table class="roster-table">
+                <thead>
+                    <tr><th>Name</th><th>Grade</th><th>Email</th><th>Phone</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="player-name">Jamir Antonio Castillo</td><td><span class="grade">9</span></td><td>jantoniocastillo@bostonk12.org</td><td>857-701-7011</td><td><span class="status-badge status-needs">⚠ Needs consent</span></td></tr>
+                    <tr><td class="player-name">Waleed Tiguite</td><td><span class="grade">TBD</span></td><td>N/A</td><td>N/A</td><td><span class="status-badge status-needs">⚠ Needs physical</span></td></tr>
+                    <tr><td class="player-name">Aman Haileselassie</td><td><span class="grade">10</span></td><td>dimtsuabreha@gmail.com</td><td>857-312-3888</td><td><span class="status-badge status-needs">⚠ Check eligibility</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CASH -->
+    <div id="cash" class="tab-content">
+        <div class="school-section">
+            <div class="school-header">🟣 CASH Charter <span class="player-count">7 Players</span><span style="font-size: 0.85rem; margin-left: 0.5rem;">(no logo available)</span></div>
+            <table class="roster-table">
+                <thead>
+                    <tr><th>Name</th><th>Grade</th><th>Email</th><th>Phone</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="player-name">Brian Monace</td><td><span class="grade">11</span></td><td>juniormonace123@gmail.com</td><td>N/A</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Juvens Alexandre</td><td><span class="grade">11</span></td><td>juvens.alexandre973@gmail.com</td><td>N/A</td><td><span class="status-badge status-ok">✓ OK</span></td></tr>
+                    <tr><td class="player-name">Lucas Nascimento</td><td><span class="grade">11</span></td><td>lucasgabi2411@icoud.com</td><td>N/A</td><td><span class="status-badge status-needs">⚠ Needs consent</span></td></tr>
+                    <tr><td class="player-name">Lima Brown</td><td><span class="grade">11</span></td><td>bc932204@gmail.com</td><td>N/A</td><td><span class="status-badge status-needs">⚠ Needs consent</span></td></tr>
+                    <tr><td class="player-name">Arly Billy</td><td><span class="grade">11</span></td><td>badboycene@gmail.com</td><td>N/A</td><td><span class="status-badge status-needs">⚠ Needs consent</span></td></tr>
+                    <tr><td class="player-name">Olgens Masse</td><td><span class="grade">TBD</span></td><td>N/A</td><td>N/A</td><td><span class="status-badge status-needs">⚠ Needs both</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAPERWORK -->
+    <div id="paperwork" class="tab-content">
+        <h2 style="margin-bottom: 1.5rem; color: var(--primary);">Paperwork Status</h2>
+        <div style="background: #fff3cd; border-left: 4px solid var(--warning); padding: 1rem; border-radius: 4px; margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">⚠️ Need Consent:</h3>
+            <ul style="margin-left: 1.5rem;">
+                <li>Leonardo Contreras (Fenway)</li>
+                <li>Jamir Antonio Castillo (Quincy)</li>
+                <li>Lucas Nascimento (CASH)</li>
+                <li>Lima Brown (CASH)</li>
+                <li>Arly Billy (CASH)</li>
+            </ul>
+        </div>
+        <div style="background: #f8d7da; border-left: 4px solid var(--danger); padding: 1rem; border-radius: 4px; margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">🏥 Need Physical:</h3>
+            <ul style="margin-left: 1.5rem;">
+                <li>Andy Salvador (Fenway) — Also needs consent</li>
+                <li>Waleed Tiguite (Quincy)</li>
+                <li>Olgens Masse (CASH) — Also needs consent</li>
+            </ul>
+        </div>
+        <div style="background: #f8d7da; border-left: 4px solid #DC3545; padding: 1rem; border-radius: 4px;">
+            <h3 style="margin-bottom: 1rem;">📅 Expiring Soon (by mid-October):</h3>
+            <ul style="margin-left: 1.5rem;">
+                <li>Johann Brooks (Snowden) — Expires 10/8</li>
+                <li>Aisak Flores (Snowden) — Expires 10/10</li>
+                <li>Ronald Dunn (Fenway) — Expires 10/11</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tabName) {
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+}
+
+function toggleAccordion(element) {
+    const body = element.nextElementSibling;
+    const toggle = element.querySelector('.accordion-toggle');
+    body.classList.toggle('active');
+    toggle.classList.toggle('active');
+}
+
+// Rolling ball animation on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const rollingBall = document.getElementById('rollingBall');
+    if (rollingBall) {
+        setTimeout(() => {
+            rollingBall.classList.add('hidden');
+        }, 4000);
+    }
+
+    const headers = document.querySelectorAll('.accordion-header');
+    headers.forEach(header => {
+        header.addEventListener('click', function(e) {
+            const body = this.nextElementSibling;
+            const toggle = this.querySelector('.accordion-toggle');
+            const isOpen = body.classList.contains('active');
+
+            // Close all other accordions
+            document.querySelectorAll('.accordion-body').forEach(el => {
+                if (el !== body) {
+                    el.classList.remove('active');
+                    el.previousElementSibling.querySelector('.accordion-toggle').classList.remove('active');
+                }
+            });
+
+            // Toggle current
+            body.classList.toggle('active');
+            toggle.classList.toggle('active');
+        });
+    });
+});
+</script>
+
+</body>
+</html>
